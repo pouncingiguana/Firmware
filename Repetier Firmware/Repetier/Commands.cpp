@@ -30,7 +30,7 @@ uint8_t mpu_threshold = 50;
 
 void accelerometer_send(uint8_t val)
 {
-#if FEATURE_Z_PROBE == 1
+#if HOTEND == 3
   Wire.beginTransmission(ACCELEROMETER_I2C_ADDR);
   Wire.write(val);
   if(Wire.endTransmission(false))
@@ -41,7 +41,7 @@ void accelerometer_send(uint8_t val)
 
 void accelerometer_write(uint8_t reg, uint8_t val)
 {
-#if FEATURE_Z_PROBE == 1
+#if HOTEND == 3
   Wire.beginTransmission(ACCELEROMETER_I2C_ADDR);
   Wire.write(reg);
   Wire.write(val);
@@ -53,7 +53,7 @@ void accelerometer_write(uint8_t reg, uint8_t val)
 
 bool accelerometer_recv(uint8_t reg)
 {
-#if FEATURE_Z_PROBE == 1
+#if HOTEND == 3
   uint8_t receiveByte;
 
   accelerometer_send(reg); //Send an 8bit register to be read
@@ -81,7 +81,7 @@ bool accelerometer_recv(uint8_t reg)
 
 void accelerometer_init()
 {
-#if FEATURE_Z_PROBE == 1
+#if HOTEND == 3
   Com::printFLN(PSTR("iis2dh accelerometer initializing..."));
   Wire.begin(); // join i2c bus
   
@@ -170,7 +170,7 @@ void accelerometer_init()
 
 bool accelerometer_status()
 {
-#if FEATURE_Z_PROBE == 1
+#if HOTEND == 3
     bool retValue = true;
 
     if(!accelerometer_recv(0x31)) { retValue = false; } //INT1_SRC (31h)
@@ -852,7 +852,7 @@ void Commands::processGCode(GCode *com)
         }
     }
     break;
-#if FEATURE_Z_PROBE
+
     case 29: // G29 Probe for Endstop Offsets, Horizontal Radius, and Z Height
     {
       if(!accelerometer_status()){

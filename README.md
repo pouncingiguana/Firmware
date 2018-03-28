@@ -1,5 +1,19 @@
-# Firmware
-This is the new repo where we will store all firmware for our machines rather than being in each machine repo seperately, as many machines use similar firmware with slight configuration changes.
+PouncingIguana's Repetier Firmware
+==================================
+This is forked from SeeMeCNC's dormant port of Repetier for anyone
+running a Rambo or Mini Rambo. I'll be doing tweaks here and there,
+possibly some code cleanup, and whatever else I decide I want my printer
+to do. Use at your own risk.
 
-This firmware is based off of Repetier Firmware, through many years and versions, as well as some integration with features of marlin and other work.  
+Arduino Version
+---------------
+Make sure you are compiling this firmware with Arduino 1.6.0 - newer
+versions will not work.
+
+Pre-Compiled Images
+-------------------
+In the Images directory, you'll find a few pre-compiled images for some
+of the SeeMeCNC printers. You can just blast these straight on to your
+printer if you don't feel like messing around with Arduino.
+
 

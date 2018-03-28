@@ -12,6 +12,7 @@ Hacker H2        = 6
 // SeeMeCNC Bowden w/PEEK barrel = 1
 // HE240 on ERIS w/accel probe   = 2
 // HE280 w/accel probe           = 3
+// HE280 w/ FST probe            = 4
 #define HOTEND 3
 
 // ### Define your motherboard here! ###
@@ -41,7 +42,7 @@ Hacker H2        = 6
 // ############ FW version info and build date for LCD and M115 string! #######################
 // ############################################################################################
 #define REPETIER_VERSION "0.92.2"
-#define FIRMWARE_DATE "20171204" // in date format yyyymmdd
+#define FIRMWARE_DATE "20180327" // in date format yyyymmdd
 
 #ifndef CONFIGURATION_H
 #define CONFIGURATION_H
@@ -103,6 +104,21 @@ Hacker H2        = 6
 #define EXT0_PID_D 176.0
 #define EXT0_PID_MAX 210
 #elif HOTEND == 3
+#define MAXTEMP 290
+#define UI_SET_MAX_EXTRUDER_TEMP 280
+#define EXT0_PID_INTEGRAL_DRIVE_MAX 230
+#define EXT0_PID_INTEGRAL_DRIVE_MIN 80
+#define EXT0_PID_PGAIN_OR_DEAD_TIME 48.3
+#define EXT0_PID_I 9.7
+#define EXT0_PID_D 60.0
+#define EXT0_PID_MAX 255
+#define EXT1_PID_INTEGRAL_DRIVE_MAX 230
+#define EXT1_PID_INTEGRAL_DRIVE_MIN 80
+#define EXT1_PID_PGAIN_OR_DEAD_TIME 48.3
+#define EXT1_PID_I 9.7
+#define EXT1_PID_D 60.0
+#define EXT1_PID_MAX 255
+#elif HOTEND == 4
 #define MAXTEMP 290
 #define UI_SET_MAX_EXTRUDER_TEMP 280
 #define EXT0_PID_INTEGRAL_DRIVE_MAX 230
