@@ -7,17 +7,21 @@ Rostock MAX v3   = 5
 Hacker H2        = 6
 */
 // ### Define your Printer Model here! ###
-#define PRINTER 5
+#define PRINTER 6
 
 // SeeMeCNC Bowden w/PEEK barrel = 1
-// HE240 on ERIS w/accel probe   = 2
-// HE280 w/accel probe           = 3
-// HE280 w/ FST probe            = 4
+// HE240 on ERIS                 = 2
+// HE280                         = 3
 #define HOTEND 3
+
+// PROBE TYPE
+// Accellerometer probe         = 1
+// FSR (or other endstop probe) = 2
+#define PROBE_TYPE 2
 
 // ### Define your motherboard here! ###
 // 301 = RAMBo    302 = MINI RAMBo
-#define MOTHERBOARD 301
+#define MOTHERBOARD 302
 
 // ##### Older Orions w/ATX had Y inverted and NEW PSU on orions needs opposite ###
 // 1 = ATX on older machines  2 = Rail style PSU on newer machines ############################
@@ -104,21 +108,6 @@ Hacker H2        = 6
 #define EXT0_PID_D 176.0
 #define EXT0_PID_MAX 210
 #elif HOTEND == 3
-#define MAXTEMP 290
-#define UI_SET_MAX_EXTRUDER_TEMP 280
-#define EXT0_PID_INTEGRAL_DRIVE_MAX 230
-#define EXT0_PID_INTEGRAL_DRIVE_MIN 80
-#define EXT0_PID_PGAIN_OR_DEAD_TIME 48.3
-#define EXT0_PID_I 9.7
-#define EXT0_PID_D 60.0
-#define EXT0_PID_MAX 255
-#define EXT1_PID_INTEGRAL_DRIVE_MAX 230
-#define EXT1_PID_INTEGRAL_DRIVE_MIN 80
-#define EXT1_PID_PGAIN_OR_DEAD_TIME 48.3
-#define EXT1_PID_I 9.7
-#define EXT1_PID_D 60.0
-#define EXT1_PID_MAX 255
-#elif HOTEND == 4
 #define MAXTEMP 290
 #define UI_SET_MAX_EXTRUDER_TEMP 280
 #define EXT0_PID_INTEGRAL_DRIVE_MAX 230
@@ -278,15 +267,21 @@ Hacker H2        = 6
 #else
 #define FEATURE_Z_PROBE 0
 #endif
-#define Z_PROBE_SENSITIVITY  20 // 0-126 7 bit value
+#if PROBE_TYPE == 1
 #define Z_PROBE_BED_DISTANCE 20
+#define Z_PROBE_SPEED 60
+#define Z_PROBE_XY_SPEED 50
+#elif PROBE_TYPE == 2
+#define Z_PROBE_BED_DISTANCE 10
+#define Z_PROBE_SPEED 5
+#define Z_PROBE_XY_SPEED 80
+#endif
+#define Z_PROBE_SENSITIVITY  20 // 0-126 7 bit value
 #define Z_PROBE_PULLUP 1 //0
 #define Z_PROBE_ON_HIGH 0 //1
 #define Z_PROBE_X_OFFSET 0
 #define Z_PROBE_Y_OFFSET 0
 #define Z_PROBE_WAIT_BEFORE_TEST 0
-#define Z_PROBE_SPEED 60
-#define Z_PROBE_XY_SPEED 50
 #define Z_PROBE_SWITCHING_DISTANCE 10
 #define Z_PROBE_REPETITIONS 1
 #define Z_PROBE_HEIGHT -0.1
@@ -347,15 +342,21 @@ Hacker H2        = 6
 #else
 #define FEATURE_Z_PROBE 0
 #endif
-#define Z_PROBE_SENSITIVITY  20 // 0-126 7 bit value
+#if PROBE_TYPE == 1
 #define Z_PROBE_BED_DISTANCE 20
+#define Z_PROBE_SPEED 60
+#define Z_PROBE_XY_SPEED 50
+#elif PROBE_TYPE == 2
+#define Z_PROBE_BED_DISTANCE 10
+#define Z_PROBE_SPEED 5
+#define Z_PROBE_XY_SPEED 80
+#endif
+#define Z_PROBE_SENSITIVITY  20 // 0-126 7 bit value
 #define Z_PROBE_PULLUP 1
 #define Z_PROBE_ON_HIGH 0
 #define Z_PROBE_X_OFFSET 0
 #define Z_PROBE_Y_OFFSET 0
 #define Z_PROBE_WAIT_BEFORE_TEST 0
-#define Z_PROBE_SPEED 60
-#define Z_PROBE_XY_SPEED 50
 #define Z_PROBE_SWITCHING_DISTANCE 10
 #define Z_PROBE_REPETITIONS 1
 #define Z_PROBE_HEIGHT -0.1
@@ -404,15 +405,21 @@ Hacker H2        = 6
 #define MAX_JERK 12
 #define MAX_ZJERK 12
 #define FEATURE_Z_PROBE 1
-#define Z_PROBE_SENSITIVITY  25 // 0-126 7 bit value
+#if PROBE_TYPE == 1
 #define Z_PROBE_BED_DISTANCE 20
+#define Z_PROBE_SPEED 60
+#define Z_PROBE_XY_SPEED 50
+#elif PROBE_TYPE == 2
+#define Z_PROBE_BED_DISTANCE 10
+#define Z_PROBE_SPEED 5
+#define Z_PROBE_XY_SPEED 80
+#endif
+#define Z_PROBE_SENSITIVITY  25 // 0-126 7 bit value
 #define Z_PROBE_PULLUP 1 //0
 #define Z_PROBE_ON_HIGH 0 //1
 #define Z_PROBE_X_OFFSET 0
 #define Z_PROBE_Y_OFFSET 0
 #define Z_PROBE_WAIT_BEFORE_TEST 0
-#define Z_PROBE_SPEED 90
-#define Z_PROBE_XY_SPEED 50
 #define Z_PROBE_SWITCHING_DISTANCE 10
 #define Z_PROBE_REPETITIONS 1
 #define Z_PROBE_HEIGHT -0.2
@@ -465,15 +472,21 @@ Hacker H2        = 6
 #define MAX_JERK 32
 #define MAX_ZJERK 32
 #define FEATURE_Z_PROBE 1
-#define Z_PROBE_SENSITIVITY  20 // 0-126 7 bit value
+#if PROBE_TYPE == 1
 #define Z_PROBE_BED_DISTANCE 20
+#define Z_PROBE_SPEED 60
+#define Z_PROBE_XY_SPEED 50
+#elif PROBE_TYPE == 2
+#define Z_PROBE_BED_DISTANCE 10
+#define Z_PROBE_SPEED 5
+#define Z_PROBE_XY_SPEED 80
+#endif
+#define Z_PROBE_SENSITIVITY  20 // 0-126 7 bit value
 #define Z_PROBE_PULLUP 1
 #define Z_PROBE_ON_HIGH 0
 #define Z_PROBE_X_OFFSET 0
 #define Z_PROBE_Y_OFFSET 0
 #define Z_PROBE_WAIT_BEFORE_TEST 0
-#define Z_PROBE_SPEED 80
-#define Z_PROBE_XY_SPEED 50
 #define Z_PROBE_SWITCHING_DISTANCE 10
 #define Z_PROBE_REPETITIONS 1
 #define Z_PROBE_HEIGHT -0.1
@@ -529,15 +542,21 @@ Hacker H2        = 6
 #define MAX_JERK 32
 #define MAX_ZJERK 32
 #define FEATURE_Z_PROBE 1
-#define Z_PROBE_SENSITIVITY  20 // 0-126 7 bit value
+#if PROBE_TYPE == 1
 #define Z_PROBE_BED_DISTANCE 20
+#define Z_PROBE_SPEED 60
+#define Z_PROBE_XY_SPEED 50
+#elif PROBE_TYPE == 2
+#define Z_PROBE_BED_DISTANCE 10
+#define Z_PROBE_SPEED 5
+#define Z_PROBE_XY_SPEED 80
+#endif
+#define Z_PROBE_SENSITIVITY  20 // 0-126 7 bit value
 #define Z_PROBE_PULLUP 1
 #define Z_PROBE_ON_HIGH 0
 #define Z_PROBE_X_OFFSET 0
 #define Z_PROBE_Y_OFFSET 0
 #define Z_PROBE_WAIT_BEFORE_TEST 0
-#define Z_PROBE_SPEED 80
-#define Z_PROBE_XY_SPEED 50
 #define Z_PROBE_SWITCHING_DISTANCE 10
 #define Z_PROBE_REPETITIONS 1
 #define Z_PROBE_HEIGHT -0.1
@@ -557,8 +576,6 @@ Hacker H2        = 6
 #define HAVE_HEATED_BED 0
 #define FEATURE_CONTROLLER 13
 #endif
-
-
 
 #define FEATURE_RETRACTION 0
 #define AUTORETRACT_ENABLED 0

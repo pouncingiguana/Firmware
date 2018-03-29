@@ -30,7 +30,7 @@ uint8_t mpu_threshold = 50;
 
 void accelerometer_send(uint8_t val)
 {
-#if HOTEND == 3
+#if PROBE_TYPE == 1
   Wire.beginTransmission(ACCELEROMETER_I2C_ADDR);
   Wire.write(val);
   if(Wire.endTransmission(false))
@@ -41,7 +41,7 @@ void accelerometer_send(uint8_t val)
 
 void accelerometer_write(uint8_t reg, uint8_t val)
 {
-#if HOTEND == 3
+#if PROBE_TYPE == 1
   Wire.beginTransmission(ACCELEROMETER_I2C_ADDR);
   Wire.write(reg);
   Wire.write(val);
@@ -53,7 +53,7 @@ void accelerometer_write(uint8_t reg, uint8_t val)
 
 bool accelerometer_recv(uint8_t reg)
 {
-#if HOTEND == 3
+#if PROBE_TYPE == 1
   uint8_t receiveByte;
 
   accelerometer_send(reg); //Send an 8bit register to be read
@@ -81,7 +81,7 @@ bool accelerometer_recv(uint8_t reg)
 
 void accelerometer_init()
 {
-#if HOTEND == 3
+#if PROBE_TYPE == 1
   Com::printFLN(PSTR("iis2dh accelerometer initializing..."));
   Wire.begin(); // join i2c bus
   
@@ -165,12 +165,14 @@ void accelerometer_init()
   accelerometer_recv(0x3A);
   accelerometer_write(0x3A,50);
   accelerometer_recv(0x3A);
+#elif PROBE_TYPE == 2
+  Com::printFLN(PSTR("FSR Probing Enabled"));
 #endif
 }
 
 bool accelerometer_status()
 {
-#if HOTEND == 3
+#if PROBE_TYPE == 1
     bool retValue = true;
 
     if(!accelerometer_recv(0x31)) { retValue = false; } //INT1_SRC (31h)
@@ -852,9 +854,10 @@ void Commands::processGCode(GCode *com)
         }
     }
     break;
-
+#if FEATURE_Z_PROBE
     case 29: // G29 Probe for Endstop Offsets, Horizontal Radius, and Z Height
     {
+#if PROBE_TYPE == 1
       if(!accelerometer_status()){
         delay(250);
         if(!accelerometer_status()) {
@@ -863,6 +866,7 @@ void Commands::processGCode(GCode *com)
           break;
         }
       }
+#endif
       GCode::executeFString(PSTR("M104 S0\nM140 S0\nM107"));
       float xProbe = 0, yProbe = 0, zProbe = 0, verify = 0, oldFeedrate = Printer::feedrate;
       int32_t probeSensitivity = Z_PROBE_SENSITIVITY;
@@ -896,7 +900,8 @@ void Commands::processGCode(GCode *com)
         Printer::moveTo(EEPROM::zProbeX1(),EEPROM::zProbeY1(),IGNORE_COORDINATE,IGNORE_COORDINATE,EEPROM::zProbeXYSpeed());
         xProbe = Printer::runZProbe(true,false,Z_PROBE_REPETITIONS,false); //First tap
         verify = Printer::runZProbe(true,false,Z_PROBE_REPETITIONS,false); //Second tap
-        if ((xProbe - verify) > Z_PROBE_TOLERANCE || (xProbe - verify) < - Z_PROBE_TOLERANCE){ //tap reports distance, if more or less than .1mm, it will re-run
+        if ((yProbe - verify) > Z_PROBE_TOLERANCE || (yProbe - verify) < - Z_PROBE_TOLERANCE){ //tap reports distance, if more or less than .1mm, it will re-run
+#if PROBE_TYPE == 1
           Com::printFLN(PSTR("Z probe (X Tower) failed on sensitivity: "), probeSensitivity );
           if(probeSensitivity < Z_PROBE_MAX_SENSITIVITY){
             accelerometer_recv(0x32);
@@ -911,6 +916,10 @@ void Commands::processGCode(GCode *com)
             Com::printErrorFLN(Com::tZProbeFailed);
             break;
           }
+#elif PROBE_TYPE == 2
+          Com::printFLN(PSTR("FSR Probe failed on X Tower - Will Retry"));
+          GCode::executeFString(PSTR("M117 X tower failed"));
+#endif
           xProbe = -1; failedProbe = true;
           continue;
         }else{
@@ -927,6 +936,7 @@ void Commands::processGCode(GCode *com)
         yProbe = Printer::runZProbe(true,false,Z_PROBE_REPETITIONS,false); //First tap
         verify = Printer::runZProbe(true,false,Z_PROBE_REPETITIONS,false); //Second tap
         if ((yProbe - verify) > Z_PROBE_TOLERANCE || (yProbe - verify) < - Z_PROBE_TOLERANCE){ //tap reports distance, if more or less than .1mm, it will re-run
+#if PROBE_TYPE == 1
           Com::printFLN(PSTR("Z probe (Y Tower) failed on sensitivity: "), probeSensitivity );
           if(probeSensitivity < Z_PROBE_MAX_SENSITIVITY){
             accelerometer_recv(0x32);
@@ -941,6 +951,10 @@ void Commands::processGCode(GCode *com)
             Com::printErrorFLN(Com::tZProbeFailed);
             break;
           }
+#elif PROBE_TYPE == 2
+          Com::printFLN(PSTR("FSR Probe failed on Y Tower - Will Retry"));
+          GCode::executeFString(PSTR("M117 Y tower failed"));
+#endif
           yProbe = -1; failedProbe = true;
           continue;
         }else{
@@ -957,6 +971,7 @@ void Commands::processGCode(GCode *com)
         zProbe = Printer::runZProbe(true,false,Z_PROBE_REPETITIONS,false); //First tap
         verify = Printer::runZProbe(true,false,Z_PROBE_REPETITIONS,false); //Second tap
         if ((zProbe - verify) > Z_PROBE_TOLERANCE || (zProbe - verify) < - Z_PROBE_TOLERANCE){ //tap reports distance, if more or less than .1mm, it will re-run
+#if PROBE_TYPE == 1
           Com::printFLN(PSTR("Z probe (Z Tower) failed on sensitivity: "), probeSensitivity );
           if(probeSensitivity < Z_PROBE_MAX_SENSITIVITY){
             accelerometer_recv(0x32);
@@ -971,6 +986,10 @@ void Commands::processGCode(GCode *com)
             Com::printErrorFLN(Com::tZProbeFailed);
             break;
           }
+#elif PROBE_TYPE == 2
+          Com::printFLN(PSTR("FSR Probe failed on Z Tower - Will Retry"));
+          GCode::executeFString(PSTR("M117 Z tower failed"));
+#endif
           zProbe = -1; failedProbe = true;
           continue;
         }else{
@@ -1051,6 +1070,7 @@ void Commands::processGCode(GCode *com)
         cProbe = Printer::runZProbe(true,false,Z_PROBE_REPETITIONS,false);
         verify = Printer::runZProbe(true,false,Z_PROBE_REPETITIONS,false);
         if ((cProbe - verify) > Z_PROBE_TOLERANCE || (cProbe - verify) < - Z_PROBE_TOLERANCE){ //tap reports distance, if more or less than .1mm, it will re-run
+#if PROBE_TYPE == 1
           Com::printFLN(PSTR("Z probe (HR - Center Point) failed on sensitivity: "), probeSensitivity );
           if(probeSensitivity < Z_PROBE_MAX_SENSITIVITY){
             accelerometer_recv(0x32);
@@ -1066,6 +1086,10 @@ void Commands::processGCode(GCode *com)
             Com::printErrorFLN(Com::tZProbeFailed);
             break;
           }
+#elif PROBE_TYPE == 2
+          Com::printFLN(PSTR("FSR Probe failed on Center Point - Will Retry"));
+          GCode::executeFString(PSTR("M117 Center Point failed"));
+#endif
           cProbe = -1; failedProbe = true;
           continue;
         }else{
@@ -1080,6 +1104,7 @@ void Commands::processGCode(GCode *com)
         zProbe = Printer::runZProbe(true,false,Z_PROBE_REPETITIONS,false);
         verify = Printer::runZProbe(true,false,Z_PROBE_REPETITIONS,false);
         if ((zProbe - verify) > Z_PROBE_TOLERANCE || (zProbe - verify) < - Z_PROBE_TOLERANCE){ //tap reports distance, if more or less than .1mm, it will re-run
+#if PROBE_TYPE == 1
           Com::printFLN(PSTR("Z probe (HR - Z tower) failed on sensitivity: "), probeSensitivity );
           if(probeSensitivity < Z_PROBE_MAX_SENSITIVITY){
             accelerometer_recv(0x32);
@@ -1094,6 +1119,10 @@ void Commands::processGCode(GCode *com)
             Com::printErrorFLN(Com::tZProbeFailed);
             break;
           }
+#elif PROBE_TYPE == 2
+          Com::printFLN(PSTR("FSR Probe failed on Z Tower - Will Retry"));
+          GCode::executeFString(PSTR("M117 Z tower failed"));
+#endif
           zProbe = -1; failedProbe = true;
           continue;
         }else{
@@ -1181,14 +1210,6 @@ void Commands::processGCode(GCode *com)
         Printer::feedrate = oldFeedrate;
         Printer::homeAxis(true,true,true);
       }else{
-        /*
-        if(com->hasP() && com->P >= 10){
-          for(int i=0;i<10;i++){
-            Com::printF(PSTR("Point "), i);
-            Com::printFLN(PSTR(" - PROBE OFFSET:"), probes[i] );
-          }
-        }else{
-        */
 #if PRINTER == 3
           Printer::maxTravelAccelerationMMPerSquareSecond[Z_AXIS] = 1850;
           Printer::updateDerivedParameter();
@@ -1205,22 +1226,9 @@ void Commands::processGCode(GCode *com)
           verify -= Printer::currentPosition[Z_AXIS];
           if ((pProbe - verify) > Z_PROBE_TOLERANCE || (pProbe - verify) < - Z_PROBE_TOLERANCE){
             Com::printFLN(PSTR("Probes do not match. Off by "), (pProbe - verify) );
-            if(probeSensitivity < Z_PROBE_MAX_SENSITIVITY){
-              accelerometer_recv(0x32);
-              probeSensitivity+=2;
-              Com::printFLN(PSTR("Setting Probe Sensitivity To:"), probeSensitivity );
-              accelerometer_write(0x32,uint8_t(probeSensitivity)); //INT1 THRESHOLD
-              accelerometer_write(0x3A,uint8_t(probeSensitivity)); //CLICK THRESHOLD
-              accelerometer_recv(0x32);
-              GCode::executeFString(PSTR("G30"));
-            }
           }else{
             pProbe = (pProbe + verify) / 2;
-            //if(com->hasP()){
-            //  if(com->P < 10){ probes[com->P] = pProbe; }
-            //}else{
-              Com::printFLN(PSTR("PROBE-ZOFFSET:"), pProbe );
-            //}
+            Com::printFLN(PSTR("PROBE-ZOFFSET:"), pProbe );
           }
 #if PRINTER == 3
           Printer::maxTravelAccelerationMMPerSquareSecond[Z_AXIS] = 400;
